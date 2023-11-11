@@ -1,28 +1,44 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link rel="stylesheet" href="styles.css">
-        <title>Visual Binary Tree</title>
-        <script src="html2canvas.min.js" type="text/javascript"></script>
-        <script type="text/javascript">
-            window.onload = function() {
-                document.getElementById("download").onclick = () => {
-                    html2canvas(document.querySelector(".tree")).then(canvas => {
-                        const base64 = canvas.toDataURL("image/png");
-                        var a = document.createElement("a");
-                        a.href = base64
-                        a.download = "binaryTree.png"
-                        a.click();
-                    });
-                }
+
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <title>Visual Decision Tree</title>
+    <script src="html2canvas.min.js" type="text/javascript"></script>
+    <script src="parseExcel.js" type="text/javascript"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+
+    <script type="text/javascript">
+        window.onload = function () {
+            document.getElementById("download").onclick = () => {
+                html2canvas(document.querySelector(".tree")).then(canvas => {
+                    const base64 = canvas.toDataURL("image/png");
+                    var a = document.createElement("a");
+                    a.href = base64
+                    a.download = "binaryTree.png"
+                    a.click();
+                });
             }
-        </script>
-    </head>
-        <body class="body">
-            <div class="tree">
-                <div class="square"></div>
-                <div class="square rounded"></div>
-            </div>
-            <button id="download">Download as png</button>
-        </body>
+
+            document.getElementById("excelInput").onchange = (e) => {
+                parseExcel(e.target.files[0], (value)=>{
+                    console.log(value.replace("[{\"", "").replace("\"}]", "").split("\"},{\""))
+                });
+            };
+
+        }
+    </script>
+</head>
+
+<body class="body">
+    <div class="tree">
+        <div class="square"></div>
+        <div class="square rounded"></div>
+    </div>
+    <button id="download">Download as png</button>
+    <input type="file" id="excelInput"></input>
+</body>
+
 </html>

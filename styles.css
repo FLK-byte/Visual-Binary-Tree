@@ -1,14 +1,21 @@
 body {
     margin: 0;
-    padding: 0
+    padding: 0;
+    display: flex;
 }
 
 [class^="square"] {
-    width: 100px;
+    min-width: 100px;
+    width: fit-content;
     height: 50px;
+    padding: 10px;
     border: 1px solid black;
 }
 
 [class*="rounded"]{
     border-radius: 10px;
+}
+
+.tree {
+    width: 90%;
 }
