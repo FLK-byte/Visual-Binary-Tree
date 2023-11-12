@@ -6,6 +6,7 @@
     <title>Visual Decision Tree</title>
     <script src="html2canvas.min.js" type="text/javascript"></script>
     <script src="parseExcel.js" type="text/javascript"></script>
+    <script src="parseExcelData.js" type="text/javascript"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
@@ -24,7 +25,7 @@
 
             document.getElementById("excelInput").onchange = (e) => {
                 parseExcel(e.target.files[0], (value)=>{
-                    console.log(value.replace("[{\"", "").replace("\"}]", "").split("\"},{\""))
+                    console.log(JSON.parse(value))
                 });
             };
 
