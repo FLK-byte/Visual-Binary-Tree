@@ -25,7 +25,7 @@
 
             document.getElementById("excelInput").onchange = (e) => {
                 parseExcel(e.target.files[0], (value)=>{
-                    console.log(JSON.parse(value))
+                    this.parseData(JSON.parse(value))
                 });
             };
 
