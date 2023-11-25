@@ -3,6 +3,7 @@
 
 <head>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.cdnfonts.com/css/helvetica-neue-55" rel="stylesheet">
     <title>Visual Decision Tree</title>
     <script src="html2canvas.min.js" type="text/javascript"></script>
     <script src="parseExcel.js" type="text/javascript"></script>
@@ -23,9 +24,35 @@
                 });
             }
 
+            const mountTreeInDom = (tree) => {
+                const domTree = document.getElementById("tree")
+
+                if (tree.value) {
+                    const tagDiv = document.createElement("div")
+                    tagDiv.className = tree.type == "variable" ? "square" : "square rounded"
+                    tagDiv.innerHTML = tree.value
+                    domTree.appendChild(tagDiv)
+                }
+
+                tree.nextItems.map((item, idx) => {
+                    const nodeDiv = document.createElement("div")
+                    nodeDiv.className = item.type == "variable" ? "square" : "square rounded"
+                    nodeDiv.innerHTML = item.value
+                    domTree.appendChild(nodeDiv)
+
+                    if (item.nextItems.length > 0) {
+                        item.nextItems.forEach((node, idx) => {
+                            //console.log(node, idx)
+                            mountTreeInDom(node)
+                        })
+                    }
+                })
+            }
+
             document.getElementById("excelInput").onchange = (e) => {
-                parseExcel(e.target.files[0], (value)=>{
-                    this.parseData(JSON.parse(value))
+                parseExcel(e.target.files[0], (value) => {
+                    this.tree = this.parseData(JSON.parse(value))
+                    mountTreeInDom(this.tree)
                 });
             };
 
@@ -34,9 +61,7 @@
 </head>
 
 <body class="body">
-    <div class="tree">
-        <div class="square"></div>
-        <div class="square rounded"></div>
+    <div class="tree" id="tree">
     </div>
     <button id="download">Download as png</button>
     <input type="file" id="excelInput"></input>

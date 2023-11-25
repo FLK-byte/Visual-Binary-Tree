@@ -2,27 +2,30 @@ this.parseData = (data) => {
     const variableRegEx = /(?<=-)(\w+)/
     const variableValueRegEx = /(?<=: )(.+)(?=" |)/
 
+    const propensionFields = ["PROPENSAO", "QTD", "NO"]
+
     const nodeTypes = {
         variable: "variable",
         tag: "tag",
         propension: "propension"
     }
 
-    const tree = {
-        value: "",
-        type: "root",
-        nextitem: []
-    }
-
-    var objEl = {
+    var tree = {
         nextItems: []
     }
+
     class Node {
         constructor(_value, _type, item) {
             this.value = _value,
-                this.type = _type,
-                this.nextItems = item ? [item] : []
+            this.type = _type,
+            this.nextItems = item ? [item] : []
         }
+    }
+
+    const getPropension = (obj) => {
+        const [key, value] = obj
+        if (propensionFields.includes(key)) return [key, value]
+        return []
     }
 
     const getVariableNameAndValue = (obj) => {
@@ -44,11 +47,29 @@ this.parseData = (data) => {
         }
         return obj.nextItems[0]
     }
-    
+
     data.map((el, idx) => {
         const objValues = Object.entries(el)
         objValues.reduce((acc, current, currentidx, arr) => {
+            const [hasPropensionField, hasPropensionValue] = getPropension(current)
+
+            if (hasPropensionField && hasPropensionValue && acc && acc.type !== nodeTypes.propension) {   
+                
+                const propension = {}
+                let i = currentidx
+                while (i < arr.length) {
+                    const [propensionField, propensionValue] = getPropension(arr[i])
+                    propension[propensionField] = propensionValue
+                    i+=1
+                }
+                const node = new Node(JSON.stringify(propension), nodeTypes.propension)
+                acc.nextItems.push(node)
+                return acc.nextItems[0]
+                
+            }
+
             const [variableName, variableValue] = getVariableNameAndValue(current)
+            
             if (!variableName || !variableValue) return
 
             if (variableName && variableValue) {
@@ -61,7 +82,7 @@ this.parseData = (data) => {
                     )
                 )
                 const lastItem = getLastItem(node)
-                
+
                 if (acc.nextItems.length > 0) {
                     if (acc.nextItems[acc.nextItems.length - 1].value == variableName) {
 
@@ -76,8 +97,9 @@ this.parseData = (data) => {
                 acc.nextItems.push(node)
                 return lastItem
             }
-        }, objEl)
+        }, tree)
 
     })
-    console.log(objEl)
+
+    return tree
 }
