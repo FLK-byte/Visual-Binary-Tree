@@ -6,16 +6,16 @@
     <link href="https://fonts.cdnfonts.com/css/helvetica-neue-55" rel="stylesheet">
     <title>Visual Decision Tree</title>
     <script src="html2canvas.min.js" type="text/javascript"></script>
+    <script src="jszip.js" type="text/javascript"></script>
+    <script src="xlsx.js" type="text/javascript"></script>
     <script src="parseExcel.js" type="text/javascript"></script>
     <script src="parseExcelData.js" type="text/javascript"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
-
     <script type="text/javascript">
         window.onload = function () {
+
             document.getElementById("download").onclick = () => {
-                html2canvas(document.querySelector(".tree")).then(canvas => {
+                html2canvas(document.getElementsByTagName("body")[0]).then(canvas => {
                     const base64 = canvas.toDataURL("image/png");
                     var a = document.createElement("a");
                     a.href = base64
@@ -24,29 +24,46 @@
                 });
             }
 
-            const mountTreeInDom = (tree) => {
+            const mountTreeInDom = (node, divToReceiveNode) => {
                 const domTree = document.getElementById("tree")
 
-                if (tree.value) {
-                    const tagDiv = document.createElement("div")
-                    tagDiv.className = tree.type == "variable" ? "square" : "square rounded"
-                    tagDiv.innerHTML = tree.value
-                    domTree.appendChild(tagDiv)
-                }
+                console.log(divToReceiveNode)
+                if (node.nextItems) {
 
-                tree.nextItems.map((item, idx) => {
-                    const nodeDiv = document.createElement("div")
-                    nodeDiv.className = item.type == "variable" ? "square" : "square rounded"
-                    nodeDiv.innerHTML = item.value
-                    domTree.appendChild(nodeDiv)
+                    const containerNodeInDom = document.createElement('div')
+                    containerNodeInDom.className = 'container'
 
-                    if (item.nextItems.length > 0) {
-                        item.nextItems.forEach((node, idx) => {
-                            //console.log(node, idx)
-                            mountTreeInDom(node)
+                    node.nextItems.forEach((el, idx) => {
+                        console.log(el)
+
+                        const newNodeInDom = document.createElement('div')
+                        newNodeInDom.className = el.type === 'variable' ? `square rounded text ${el.value}` : `square text ${el.value}`
+                        newNodeInDom.innerHTML = el.value
+
+                        divToReceiveNode ? divToReceiveNode.appendChild(newNodeInDom) : containerNodeInDom.appendChild(newNodeInDom)
+
+                    })
+
+                    divToReceiveNode ? divToReceiveNode.appendChild(containerNodeInDom) : domTree.appendChild(containerNodeInDom)
+                    console.log(node)
+                    if (node.nextItems.length === 1) mountTreeInDom(node.nextItems[0])
+
+                    if (node.nextItems.length > 1) {
+                        node.nextItems.forEach((el, idx) => {
+                            const ElDiv = document.querySelector(`div[class*=${`"`+el.value+`"`}]`)
+
+                            const parentElDiv = ElDiv.parentNode
+                            parentElDiv.removeChild(ElDiv)
+
+                            const container = document.createElement('div')
+                            container.className = "vertical-container"
+                            container.appendChild(ElDiv)
+
+                            parentElDiv.appendChild(container)
+                            mountTreeInDom(el, container)
                         })
                     }
-                })
+                }
             }
 
             document.getElementById("excelInput").onchange = (e) => {
@@ -61,10 +78,10 @@
 </head>
 
 <body class="body">
-    <div class="tree" id="tree">
-    </div>
-    <button id="download">Download as png</button>
-    <input type="file" id="excelInput"></input>
+<div class="tree" id="tree">
+</div>
+<button id="download">Download as png</button>
+<input type="file" id="excelInput"></input>
 </body>
 
 </html>

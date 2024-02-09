@@ -37,14 +37,11 @@ this.parseData = (data) => {
         return [variableName[0], variableValue[0]]
     }
 
-    const verifyUpperCase = (value) => {
-        return value == value.toUpperCase()
-    }
+    const verifyUpperCase = (value) => (value == value.toUpperCase())
+    
 
     const getLastItem = (obj) => {
-        if (obj.nextItems > 0) {
-            getLastItem(obj.nextItems[0])
-        }
+        if (obj.nextItems > 0) return getLastItem(obj.nextItems[0])
         return obj.nextItems[0]
     }
 
@@ -65,7 +62,7 @@ this.parseData = (data) => {
                 const node = new Node(JSON.stringify(propension), nodeTypes.propension)
                 acc.nextItems.push(node)
                 return acc.nextItems[0]
-                
+
             }
 
             const [variableName, variableValue] = getVariableNameAndValue(current)
