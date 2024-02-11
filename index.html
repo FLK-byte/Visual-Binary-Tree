@@ -32,21 +32,38 @@
             const formatPropension = () => {
                 const propensions = document.querySelectorAll('div[class*="propension"]')
                 const _propensions = [...propensions]
-                _propensions.map((el, idx)=>{
-                    el.innerHTML = parsePropension(el.innerHTML)
-                })
+                _propensions.map((el, idx)=> el.innerHTML = parsePropension(el.innerHTML))
+            }
+
+            const formatContainers = (node) => {
+                    const verticalContainers = document.querySelectorAll(".container > .vertical-container")
+                    const _verticalContainers = [...verticalContainers]
+
+                    const nodesToMap = node ? node : _verticalContainers
+                    nodesToMap.map((el, idx)=>{
+                        const containerChilds = [...el.childNodes].filter((node)=> node.className == "vertical-container")
+
+                        const container = document.createElement('div')
+                        container.className = "horizontal-container"
+
+                        containerChilds.forEach((child)=>{
+                            el.removeChild(child)
+                            container.appendChild(child)
+                            formatContainers([child])
+                        })
+                        el.appendChild(container)
+                    })
+
             }
             const mountTreeInDom = (node, divToReceiveNode) => {
                 const domTree = document.getElementById("tree")
 
-                console.log(divToReceiveNode)
                 if (node.nextItems) {
 
                     const containerNodeInDom = document.createElement('div')
                     containerNodeInDom.className = 'container'
 
                     node.nextItems.forEach((el, idx) => {
-                        console.log(el)
 
                         const newNodeInDom = document.createElement('div')
                         newNodeInDom.className = el.type === 'variable' ? `square rounded text ${el.value} ${el.type}` : `square text ${el.value} ${el.type}`
@@ -56,7 +73,7 @@
 
                     })
                     if (containerNodeInDom.hasChildNodes()) divToReceiveNode ? divToReceiveNode.parentNode.appendChild(containerNodeInDom) : domTree.appendChild(containerNodeInDom)
-                    console.log(node)
+
                     if (node.nextItems.length === 1) mountTreeInDom(node.nextItems[0], divToReceiveNode)
 
                     if (node.nextItems.length > 1) {
@@ -82,6 +99,7 @@
                     this.tree = this.parseData(JSON.parse(value))
                     mountTreeInDom(this.tree)
                     formatPropension()
+                    formatContainers()
                 });
             };
 

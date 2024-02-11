@@ -11,6 +11,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
 }
 
 [class^="square"] {
@@ -20,6 +21,7 @@ body {
     padding: 10px;
     border: 1px solid black;
     display: flex;
+    margin: 1px;
 }
 
 [class*="rounded"]{
@@ -41,6 +43,13 @@ body {
 [class*="vertical-container"] {
     flex-direction: column;
     align-items: center;
+    padding: 10px;
+    justify-content: start;
+}
+
+[class*="horizontal-container"] {
+    flex-direction: row;
+    align-items: flex-start;
     padding: 10px;
 }
 
