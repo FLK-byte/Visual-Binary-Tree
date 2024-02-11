@@ -24,6 +24,18 @@
                 });
             }
 
+            const parsePropension = (value) => {
+                const {PROPENSAO, QTD} = JSON.parse(`${value}`)
+                return `Propensao: ${PROPENSAO} \n Quantidade: ${QTD}`
+            }
+
+            const formatPropension = () => {
+                const propensions = document.querySelectorAll('div[class*="propension"]')
+                const _propensions = [...propensions]
+                _propensions.map((el, idx)=>{
+                    el.innerHTML = parsePropension(el.innerHTML)
+                })
+            }
             const mountTreeInDom = (node, divToReceiveNode) => {
                 const domTree = document.getElementById("tree")
 
@@ -37,16 +49,15 @@
                         console.log(el)
 
                         const newNodeInDom = document.createElement('div')
-                        newNodeInDom.className = el.type === 'variable' ? `square rounded text ${el.value}` : `square text ${el.value}`
+                        newNodeInDom.className = el.type === 'variable' ? `square rounded text ${el.value} ${el.type}` : `square text ${el.value} ${el.type}`
                         newNodeInDom.innerHTML = el.value
 
                         divToReceiveNode ? divToReceiveNode.appendChild(newNodeInDom) : containerNodeInDom.appendChild(newNodeInDom)
 
                     })
-
-                    divToReceiveNode ? divToReceiveNode.appendChild(containerNodeInDom) : domTree.appendChild(containerNodeInDom)
+                    if (containerNodeInDom.hasChildNodes()) divToReceiveNode ? divToReceiveNode.parentNode.appendChild(containerNodeInDom) : domTree.appendChild(containerNodeInDom)
                     console.log(node)
-                    if (node.nextItems.length === 1) mountTreeInDom(node.nextItems[0])
+                    if (node.nextItems.length === 1) mountTreeInDom(node.nextItems[0], divToReceiveNode)
 
                     if (node.nextItems.length > 1) {
                         node.nextItems.forEach((el, idx) => {
@@ -70,6 +81,7 @@
                 parseExcel(e.target.files[0], (value) => {
                     this.tree = this.parseData(JSON.parse(value))
                     mountTreeInDom(this.tree)
+                    formatPropension()
                 });
             };
 
