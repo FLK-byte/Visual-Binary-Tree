@@ -51,7 +51,7 @@
                             container.appendChild(child)
                             formatContainers([child])
                         })
-                        el.appendChild(container)
+                        if (container.hasChildNodes()) el.appendChild(container)
                     })
 
             }
